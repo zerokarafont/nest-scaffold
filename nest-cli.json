@@ -1,0 +1,22 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "assets": [
+      {
+        "include": "**/*.graphql",
+        "exclude": "**/omitted.graphql",
+        "watchAssets": true
+      },
+      {
+        "include": "**/*.env",
+        "watchAssets": true
+      },
+      {
+        "include": "upload/**/*",
+        "watchAssets": true
+      }
+    ],
+    "watchAssets": true
+  }
+}
