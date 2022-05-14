@@ -11,11 +11,12 @@ import { AdminUserModule } from './user';
 import { AuthModule } from './auth';
 import { FileLocalModule } from './file';
 
-const port = 9000;
+const PORT = 9000;
+const CORS_ALLOW_LIST = [];
 
 function configureGlobalMiddlewares(app: INestApplication) {
   app.enableCors({
-    origin: ['localhost', '127.0.0.1'],
+    origin: process.env.NODE_ENV === 'development' || CORS_ALLOW_LIST,
     maxAge: 86400, // 单位s, 在此时间内不用发送重复的预检请求
     credentials: true,
   });
@@ -93,7 +94,7 @@ async function bootstrap() {
   configureGlobalMiddlewares(app);
   configureRestApiDoc(app);
 
-  await app.listen(port);
+  await app.listen(PORT);
 }
 
 process.on('unhandledRejection', (reason) => {
@@ -106,7 +107,7 @@ process.on('uncaughtException', (error) => {
 });
 
 bootstrap()
-  .then(() => Logger.log(`开始监听${port}端口`))
+  .then(() => Logger.log(`开始监听${PORT}端口`))
   .catch((err) => {
     Logger.error(err);
   });

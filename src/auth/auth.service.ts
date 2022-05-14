@@ -1,10 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ConfigService } from 'src/config';
 import { UserService } from 'src/user/services/user.service';
 import * as crypto from 'crypto';
 import { SALT } from 'src/constants';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user';
+import { SignatureDto } from './dto/signature.dto';
+import { SiweMessage } from 'siwe';
 
 @Injectable()
 export class AuthService {
@@ -56,6 +62,25 @@ export class AuthService {
       type: 'account',
       currentAuthority: 'admin',
     };
+  }
+
+  async loginForWallet(payload: SignatureDto, session: Record<string, any>) {
+    const { message, signature } = payload;
+    const siweMessage = new SiweMessage(message);
+    try {
+      const fields = await siweMessage.validate(signature);
+
+      if (fields.nonce !== session.nonce) {
+        throw new UnprocessableEntityException('非法的nonce值');
+      }
+      session.wallet = fields.address;
+
+      return 'success';
+    } catch (e) {
+      session.wallet = null;
+      session.nonce = null;
+      throw new UnprocessableEntityException('签名验证失败');
+    }
   }
 
   async register(user: CreateUserDto) {
