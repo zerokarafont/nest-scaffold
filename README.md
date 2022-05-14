@@ -26,26 +26,64 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
-
+## 开发环境
 ```bash
-$ npm install
+node v14.17.0
+npm 6.14.13
+yarn 1.15.2
+redis 
+mysql 8.0
 ```
 
-## Running the app
+## 安装
+
+```bash
+$ yarn
+```
+
+## 运行
 
 ```bash
 # development
-$ npm run start
+$ yarn start
 
 # watch mode
-$ npm run start:dev
+$ yarn start:dev
+
+# debug mode
+$ yarn start:debug
 
 # production mode
-$ npm run start:prod
+$ yarn start:prod
 ```
 
-## Test
+## 开发
+### 配置
+- 配置文件在setting目录下, 开发环境使用development.env , 生产环境使用prod.env
+### redis
+- ` docker run --name redis -p 6379:6379 -d redis`
+### mysql
+- 如果出现错误 `Error: Unknown database 'xxx'`需要先建立对应名称的数据库, DB_NAME在.env文件中配置
+- 如果使用docker, 需要使用volume, 防止数据丢失
+  + 创建volume 
+    + `docker volume create soulbound` windows优先使用此方式, `docker run --name mysql -v soulbound:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -d mysql:tag`
+    + unix系统直接映射目录, `docker run --name mysql -v /my/own/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -d mysql:tag`
+  
+### 文档
+- 前端swagger http://localhost:9000/api/api
+- 管理端swagger http://localhost:9000/api/admin
+- TypeORM https://orkhan.gitbook.io/typeorm/docs
+
+### 功能
+- [x] 支持以太坊钱包登录
+- TODO...
+
+### 部署
+- [] 配置 CORS_ALLOW_LIST
+- [] 配置 prod.env
+- TODO...
+
+## 测试
 
 ```bash
 # unit tests

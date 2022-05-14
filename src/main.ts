@@ -84,6 +84,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     /**
      * @link {https://mikro-orm.io/docs/usage-with-nestjs#request-scoping-when-using-graphql}
+     * @deprecated
      */
     bodyParser: false,
   });
