@@ -34,16 +34,20 @@ export class FileService {
     return updateFile;
   }
 
-  async remove(id: number) {
+  async remove(id: number, soft = true) {
     const findFile = await this.fileRepository.findOne(id);
     if (!findFile) {
       throw new BadRequestException('文件不存在');
     }
-    const removeFile = Object.assign(findFile, {
-      deletedAt: new Date(),
-    });
-    await this.fileRepository.save(removeFile);
-    return removeFile;
+    if (!soft) {
+      const removeFile = Object.assign(findFile, {
+        deletedAt: new Date(),
+      });
+      await this.fileRepository.save(removeFile);
+      return removeFile;
+    }
+    await this.fileRepository.softRemove(findFile);
+    return findFile;
   }
 
   async queryByPagination(query: FileQueryDto) {

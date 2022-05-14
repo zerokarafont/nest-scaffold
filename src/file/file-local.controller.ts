@@ -71,6 +71,12 @@ export class FileLocalController {
     console.log(files);
   }
 
+  @Get('remove/:id')
+  @ApiOperation({ summary: '删除单个文件' })
+  async removeOneFile(@Param('id') id: number) {
+    return await this.fileService.remove(id);
+  }
+
   @Get('list')
   @ApiOperation({ summary: '分页查询文件' })
   async queryFilesByPagination(@Query() query: FileQueryDto) {
