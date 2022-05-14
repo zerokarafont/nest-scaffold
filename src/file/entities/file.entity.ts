@@ -1,18 +1,21 @@
-import { Entity, Enum, Property } from '@mikro-orm/core';
+import { Entity, Column } from 'typeorm';
 import { BaseEntity } from 'src/common/entities';
 import { UploadType } from '../interfaces/file-type';
 
 @Entity()
 export class File extends BaseEntity {
-  @Property()
+  @Column()
   path!: string;
 
-  @Property()
+  @Column()
   filename!: string;
 
-  @Property()
+  @Column()
   size!: number;
 
-  @Enum(() => UploadType)
+  @Column({
+    type: 'enum',
+    enum: UploadType,
+  })
   type!: UploadType;
 }

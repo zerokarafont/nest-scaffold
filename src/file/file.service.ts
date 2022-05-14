@@ -1,5 +1,5 @@
-import { EntityRepository } from '@mikro-orm/mysql';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { FileQueryDto } from './dto/file.dto';
 import { File } from './entities/file.entity';
@@ -9,7 +9,7 @@ import { UploadType } from './interfaces/file-type';
 export class FileService {
   constructor(
     @InjectRepository(File)
-    private readonly fileRepository: EntityRepository<File>,
+    private readonly fileRepository: Repository<File>,
   ) {}
 
   async create(file: Express.Multer.File, type: UploadType) {
@@ -20,7 +20,7 @@ export class FileService {
       size,
       type,
     });
-    await this.fileRepository.persistAndFlush(createFile);
+    await this.fileRepository.save(createFile);
     return createFile;
   }
 
@@ -29,8 +29,8 @@ export class FileService {
     if (!findFile) {
       throw new BadRequestException('文件不存在');
     }
-    const updateFile = this.fileRepository.assign(findFile, file);
-    await this.fileRepository.persistAndFlush(updateFile);
+    const updateFile = Object.assign(findFile, file);
+    await this.fileRepository.save(updateFile);
     return updateFile;
   }
 
@@ -39,18 +39,23 @@ export class FileService {
     if (!findFile) {
       throw new BadRequestException('文件不存在');
     }
-    const removeFile = this.fileRepository.assign(findFile, {
+    const removeFile = Object.assign(findFile, {
       deletedAt: new Date(),
     });
-    await this.fileRepository.persistAndFlush(removeFile);
+    await this.fileRepository.save(removeFile);
     return removeFile;
   }
 
   async queryByPagination(query: FileQueryDto) {
     const { current, pageSize, ...rest } = query;
-    const [data, total] = await this.fileRepository.findAndCount(rest, {
-      limit: pageSize,
-      offset: (current - 1) * pageSize,
+    // const [data, total] = await this.fileRepository.findAndCount(rest, {
+    //   limit: pageSize,
+    //   offset: (current - 1) * pageSize,
+    // });
+    const [data, total] = await this.fileRepository.findAndCount({
+      where: rest,
+      take: pageSize,
+      skip: (current - 1) * pageSize,
     });
     return {
       list: data,

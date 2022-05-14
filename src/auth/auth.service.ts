@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, pass: string) {
-    const user = await this.userService.findOne({ username });
+    const user = await this.userService.findOneWithPass({ username });
     if (!user) {
       throw new BadRequestException(`用户${username}不存在`);
     }

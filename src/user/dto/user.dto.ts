@@ -1,5 +1,11 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsString({ message: '用户名必须是字符串' })
@@ -14,3 +20,11 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+export class QueryUserDto extends PickType(UpdateUserDto, ['username']) {
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @ApiPropertyOptional()
+  id?: number;
+}

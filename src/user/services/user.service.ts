@@ -1,24 +1,26 @@
-import { EntityRepository } from '@mikro-orm/mysql';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from 'src/config';
 import { User } from '../entities/user.entity';
 import { SALT } from 'src/constants';
 import * as crypto from 'crypto';
-import { FilterQuery } from '@mikro-orm/core';
-import { CreateUserDto } from '../dto/user.dto';
+import { CreateUserDto, QueryUserDto } from '../dto/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
+    private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     const { username, password } = createUserDto;
-    const user = await this.userRepository.findOne({ username });
+    const user = await this.userRepository.findOne({
+      where: { username },
+      select: ['username', 'password'],
+    });
     if (user) {
       throw new BadRequestException('该用户名已存在');
     }
@@ -30,12 +32,26 @@ export class UserService {
       username,
       password: cryptoPass,
     });
-    await this.userRepository.persistAndFlush(createUser);
+    await this.userRepository.save(createUser);
+    delete createUser.password;
     return createUser;
   }
 
-  async findOne(query: FilterQuery<User>) {
-    const user = await this.userRepository.findOne(query);
+  async findOne(query: QueryUserDto) {
+    const user = await this.userRepository.findOne({ where: query });
+    if (!user) {
+      throw new BadRequestException('用户不存在');
+    }
+    return user;
+  }
+
+  async findOneWithPass(query: QueryUserDto) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.username', 'user.password'])
+      .where('user.username = :username', { username: query.username })
+      .orWhere('user.id = :id', { id: query.id })
+      .getOne();
     if (!user) {
       throw new BadRequestException('用户不存在');
     }

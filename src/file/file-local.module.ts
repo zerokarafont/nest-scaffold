@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FileLocalController } from './file-local.controller';
 import { FileService } from './file.service';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from './entities/file.entity';
 
 const storage = multer.diskStorage({
@@ -29,9 +29,10 @@ const storage = multer.diskStorage({
 @Module({
   imports: [
     MulterModule.register({ storage: storage }),
-    MikroOrmModule.forFeature([File]),
+    TypeOrmModule.forFeature([File]),
   ],
   controllers: [FileLocalController],
   providers: [FileService],
+  exports: [FileService],
 })
 export class FileLocalModule {}

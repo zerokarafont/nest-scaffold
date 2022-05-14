@@ -1,21 +1,25 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  Column,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
-@Entity({ abstract: true })
 export abstract class BaseEntity {
   @ApiProperty({ description: 'id' })
-  @PrimaryKey({ autoincrement: true })
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @ApiProperty({ description: '创建时间' })
-  @Property({ onCreate: () => new Date() })
+  @CreateDateColumn()
   createdAt: Date = new Date();
 
   @ApiProperty({ description: '更新时间' })
-  @Property({ onUpdate: () => new Date(), hidden: true })
+  @UpdateDateColumn()
   updatedAt: Date = new Date();
 
   @ApiProperty({ description: '删除时间' })
-  @Property({ nullable: true })
+  @Column({ nullable: true })
   deletedAt?: Date;
 }

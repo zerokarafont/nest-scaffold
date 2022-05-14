@@ -61,6 +61,6 @@ export class AdminUserController {
   @ApiBadRequestResponse({ type: ExceptionResponse })
   @Get('/:id')
   findOne(@Param('id') id: number) {
-    return this.userService.findOne(id);
+    return this.userService.findOne({ id });
   }
 }

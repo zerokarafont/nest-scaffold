@@ -1,10 +1,4 @@
-import {
-  Module,
-  Logger,
-  Inject,
-  NestModule,
-  MiddlewareConsumer,
-} from '@nestjs/common';
+import { Module, Inject, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import {
@@ -21,12 +15,10 @@ import {
   THROTTLE_LIMIT,
   THROTTLE_TTL,
 } from './constants';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UtilsModule } from './utils';
 import { ConfigModule, ConfigService } from './config';
 import { IRedisOptions, PK_REDIS_OPTIONS, RedisModule } from './redis';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { AsyncLocalStorage } from 'async_hooks';
-import { EntityManager } from '@mikro-orm/core';
 import { AdminUserModule } from './user';
 import { FileModule } from './file';
 import { AuthModule } from './auth';
@@ -35,8 +27,6 @@ import connectRedis from 'connect-redis';
 import Redis from 'ioredis';
 
 const PK_SESSION_OPTIONS = 'pk_session_options';
-const logger = new Logger('MikroORM');
-export const storage = new AsyncLocalStorage<EntityManager>();
 const RedisStore = connectRedis(expressSession);
 
 @Module({
@@ -49,24 +39,25 @@ const RedisStore = connectRedis(expressSession);
         port: +config.get(REDIS_PORT),
       }),
     }),
-    MikroOrmModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        debug: process.env.NODE_ENV === 'development',
+        // debug: process.env.NODE_ENV === 'development',
         type: 'mysql',
         host: config.get(DB_HOST),
         port: +config.get(DB_PORT),
-        user: config.get(DB_USER),
+        username: config.get(DB_USER),
         password: config.get(DB_PASS),
-        dbName: config.get(DB_NAME),
-        entities: ['dist/**/*.entity.js'],
-        entitiesTs: ['src/**/*.entity.ts'],
-        registerRequestContext: false,
-        context: () => storage.getStore(),
-        logger: logger.log.bind(logger),
-        migrations: {
-          path: 'dist/migrations',
-          pathTs: 'src/migrations',
+        database: config.get(DB_NAME),
+        // entities: ['dist/**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
+        synchronize: process.env.NODE_ENV === 'development',
+        cache: {
+          type: 'ioredis',
+          options: {
+            host: config.get(REDIS_HOST),
+            port: +config.get(REDIS_PORT),
+          },
         },
       }),
     }),

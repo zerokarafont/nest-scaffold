@@ -1,10 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
-import { AppModule, storage } from './app.module';
+import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { MikroORM } from '@mikro-orm/core';
 import { HttpExceptionFilter } from './common';
 import express from 'express';
 import { HttpResponseInterceptor } from './common/interceptor/response.interceptor';
@@ -15,18 +14,12 @@ import { FileLocalModule } from './file';
 const port = 9000;
 
 function configureGlobalMiddlewares(app: INestApplication) {
-  const orm = app.get(MikroORM);
   app.enableCors({
     origin: ['localhost', '127.0.0.1'],
     maxAge: 86400, // 单位s, 在此时间内不用发送重复的预检请求
     credentials: true,
   });
-  app
-    .use(express.json({ limit: '50mb' }))
-    .use(helmet())
-    .use((req, res, next) => {
-      storage.run(orm.em.fork({ useContext: true }), next);
-    });
+  app.use(express.json({ limit: '50mb' })).use(helmet());
 }
 
 function configureGlobalAOPs(app: INestApplication) {
@@ -99,11 +92,6 @@ async function bootstrap() {
   configureGlobalAOPs(app);
   configureGlobalMiddlewares(app);
   configureRestApiDoc(app);
-
-  if (process.env.NODE_ENV === 'development') {
-    await app.get(MikroORM).getSchemaGenerator().ensureDatabase();
-    await app.get(MikroORM).getSchemaGenerator().updateSchema();
-  }
 
   await app.listen(port);
 }
