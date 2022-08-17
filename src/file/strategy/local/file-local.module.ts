@@ -4,9 +4,9 @@ import multer from 'multer';
 import * as path from 'path';
 import * as fs from 'fs';
 import { FileLocalController } from './file-local.controller';
-import { FileService } from './file.service';
+import { FileService } from '../../file.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { File } from './entities/file.entity';
+import { File } from '../../entities/file.entity';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

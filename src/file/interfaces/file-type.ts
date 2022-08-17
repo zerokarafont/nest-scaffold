@@ -8,6 +8,7 @@ export enum UploadType {
   LOCAL = 'local',
   /**
    * 去中心化存储
+   * 默认集成Pinata的IPFS服务
    */
   IPFS = 'ipfs',
   /**

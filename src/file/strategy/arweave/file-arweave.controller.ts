@@ -17,15 +17,19 @@ import {
   ApiCookieAuth,
 } from '@nestjs/swagger';
 import { SessionAuthGuard } from 'src/auth';
-import { FileUploadDto, FilesUploadDto, FileQueryDto } from './dto/file.dto';
-import { FileService } from './file.service';
-import { UploadType } from './interfaces/file-type';
+import {
+  FileUploadDto,
+  FilesUploadDto,
+  FileQueryDto,
+} from '../../dto/file.dto';
+import { FileService } from '../../file.service';
+import { UploadType } from '../../interfaces/file-type';
 
 @ApiTags('file')
 @ApiCookieAuth()
 @UseGuards(SessionAuthGuard)
 @Controller('file/local')
-export class FileLocalController {
+export class FileArweaveController {
   constructor(private readonly fileService: FileService) {}
 
   @Post('uploadFile')
@@ -34,7 +38,7 @@ export class FileLocalController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: FileUploadDto })
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.fileService.create(file, UploadType.LOCAL);
+    return this.fileService.create(file, UploadType.ARWEAVE);
   }
 
   @Post('uploadFiles')
@@ -82,7 +86,7 @@ export class FileLocalController {
   async queryFilesByPagination(@Query() query: FileQueryDto) {
     return await this.fileService.queryByPagination({
       ...query,
-      type: UploadType.LOCAL,
+      type: UploadType.ARWEAVE,
     });
   }
 }

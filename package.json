@@ -29,6 +29,7 @@
     "@nestjs/swagger": "^5.2.0",
     "@nestjs/throttler": "^2.0.0",
     "@nestjs/typeorm": "^8.0.3",
+    "@pinata/sdk": "^1.1.26",
     "bytes": "^3.1.2",
     "cache-manager": "^3.6.0",
     "cache-manager-ioredis": "^2.1.0",

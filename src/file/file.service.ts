@@ -52,10 +52,6 @@ export class FileService {
 
   async queryByPagination(query: FileQueryDto) {
     const { current, pageSize, ...rest } = query;
-    // const [data, total] = await this.fileRepository.findAndCount(rest, {
-    //   limit: pageSize,
-    //   offset: (current - 1) * pageSize,
-    // });
     const [data, total] = await this.fileRepository.findAndCount({
       where: rest,
       take: pageSize,

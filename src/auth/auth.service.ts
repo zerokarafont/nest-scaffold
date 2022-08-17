@@ -66,8 +66,8 @@ export class AuthService {
 
   async loginForWallet(payload: SignatureDto, session: Record<string, any>) {
     const { message, signature } = payload;
-    const siweMessage = new SiweMessage(message);
     try {
+      const siweMessage = new SiweMessage(message);
       const fields = await siweMessage.validate(signature);
 
       if (fields.nonce !== session.nonce) {

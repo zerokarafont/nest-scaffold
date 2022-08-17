@@ -16,7 +16,7 @@ export class EthereumAuthGuard implements CanActivate {
 
     if (!wallet) {
       // 此异常前端捕获可以静默处理，不需要弹出消息提示
-      throw new UnauthorizedException('please connect your wallet');
+      throw new UnauthorizedException('请连接你的钱包');
     }
 
     return true;
