@@ -81,13 +81,7 @@ function configureRestApiDoc(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    /**
-     * @link {https://mikro-orm.io/docs/usage-with-nestjs#request-scoping-when-using-graphql}
-     * @deprecated
-     */
-    bodyParser: false,
-  });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
   app.set('trust proxy', 1);
 
