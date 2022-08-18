@@ -71,3 +71,13 @@ export const SESSION_SECRET = 'SESSION_SECRET';
  * session过期时间 (单位: 秒)
  */
 export const SESSION_EXPIRES_IN_SECONDS = 'SESSION_EXPIRES_IN_SECONDS';
+/**
+ * ipfs网关
+ */
+export const IPFS_GATEWAY = 'IPFS_GATEWAY';
+
+export const PINATA_API_KEY = 'PINATA_API_KEY';
+
+export const PINATA_SECRET_API_KEY = 'PINATA_SECRET_API_KEY';
+
+export const PINATA_JWT = 'PINATA_JWT';
