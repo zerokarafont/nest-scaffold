@@ -61,7 +61,7 @@ export class FileLocalController {
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(`${id}${file}`);
+    return this.fileService.update(id, file);
   }
 
   @Post('updateFiles')

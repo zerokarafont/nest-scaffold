@@ -1,6 +1,5 @@
 import { PINATA_API_KEY, PINATA_SECRET_API_KEY } from 'src/constants';
 import {
-  Injectable,
   Logger,
   ServiceUnavailableException,
   BadRequestException,
@@ -8,10 +7,8 @@ import {
 import { IPFS_GATEWAY } from 'src/constants';
 import { ConfigService } from 'src/config';
 import pinataSDK, { PinataClient } from '@pinata/sdk';
-import { Readable } from 'stream';
 import { join } from 'path';
 
-@Injectable()
 export class PinataStorage {
   private pinata: PinataClient;
 
@@ -22,6 +19,7 @@ export class PinataStorage {
   private initialize() {
     const API_KEY = this.configService.get(PINATA_API_KEY);
     const SECRET_KEY = this.configService.get(PINATA_SECRET_API_KEY);
+
     this.pinata = pinataSDK(API_KEY, SECRET_KEY);
     this.pinata
       .testAuthentication()
@@ -35,21 +33,27 @@ export class PinataStorage {
         }
       })
       .catch((err) => {
-        throw new ServiceUnavailableException(err);
+        throw new ServiceUnavailableException(err.details);
       });
   }
 
   _handleFile(req, file: Express.Multer.File, cb) {
-    const { buffer } = file;
-    const readable = Readable.from(buffer.toString());
+    const { originalname, stream } = file;
+
+    (stream as any).path = originalname;
+
     this.pinata
-      .pinFileToIPFS(readable)
+      .pinFileToIPFS(stream, {
+        pinataOptions: { cidVersion: 1 },
+      })
       .then((result) => {
-        const { IpfsHash } = result;
+        const { IpfsHash, PinSize } = result;
         const gateway = this.configService.get(IPFS_GATEWAY);
         const path = join(gateway, IpfsHash);
         cb(null, {
           path,
+          filename: originalname,
+          size: PinSize,
         });
       })
       .catch((err) => {
@@ -62,8 +66,4 @@ export class PinataStorage {
     delete file.buffer;
     cb(null);
   }
-}
-
-export default function () {
-  return new PinataStorage();
 }

@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { FileQueryDto } from './dto/file.dto';
 import { File } from './entities/file.entity';
-import { UploadType } from './interfaces/file-type';
+import { UploadType, Platform } from './interfaces/file-type';
 
 @Injectable()
 export class FileService {
@@ -25,7 +25,9 @@ export class FileService {
   }
 
   async update(id: number, file: Express.Multer.File) {
-    const findFile = await this.fileRepository.findOne(id);
+    const findFile = await this.fileRepository.findOne(id, {
+      withDeleted: false,
+    });
     if (!findFile) {
       throw new BadRequestException('文件不存在');
     }
@@ -34,26 +36,20 @@ export class FileService {
     return updateFile;
   }
 
-  async remove(id: number, soft = true) {
+  async remove(id: number) {
     const findFile = await this.fileRepository.findOne(id);
     if (!findFile) {
       throw new BadRequestException('文件不存在');
-    }
-    if (!soft) {
-      const removeFile = Object.assign(findFile, {
-        deletedAt: new Date(),
-      });
-      await this.fileRepository.save(removeFile);
-      return removeFile;
     }
     await this.fileRepository.softRemove(findFile);
     return findFile;
   }
 
   async queryByPagination(query: FileQueryDto) {
-    const { current, pageSize, ...rest } = query;
+    const { current, pageSize, platform, ...rest } = query;
     const [data, total] = await this.fileRepository.findAndCount({
       where: rest,
+      withDeleted: platform === Platform.ADMIN ? true : false,
       take: pageSize,
       skip: (current - 1) * pageSize,
     });

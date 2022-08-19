@@ -9,7 +9,7 @@ import express from 'express';
 import { HttpResponseInterceptor } from './common/interceptor/response.interceptor';
 import { AdminUserModule } from './user';
 import { AuthModule } from './auth';
-import { FileLocalModule } from './file';
+import { FileLocalModule, FileIPFSModule } from './file';
 
 const PORT = 9000;
 const CORS_ALLOW_LIST = [];
@@ -61,7 +61,7 @@ function configureRestApiDoc(app: INestApplication) {
       include: [AdminUserModule, AuthModule, FileLocalModule],
     });
     const appDocument = SwaggerModule.createDocument(app, appOptions, {
-      include: [AuthModule],
+      include: [AuthModule, FileIPFSModule],
     });
     /**
      * admin文档json文件

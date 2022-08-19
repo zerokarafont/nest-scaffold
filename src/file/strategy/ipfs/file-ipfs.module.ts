@@ -4,15 +4,21 @@ import { FileIPFSController } from './file-ipfs.controller';
 import { FileService } from '../../file.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from '../../entities/file.entity';
-import PinataEngine, { PinataStorage } from './pinata.storage';
+import { PinataStorage } from './pinata.storage';
+import { ConfigService } from 'src/config';
 
 @Module({
   imports: [
-    MulterModule.register({ storage: PinataEngine }),
+    MulterModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        storage: new PinataStorage(config),
+      }),
+    }),
     TypeOrmModule.forFeature([File]),
   ],
   controllers: [FileIPFSController],
-  providers: [FileService, PinataStorage],
+  providers: [FileService],
   exports: [FileService],
 })
 export class FileIPFSModule {}

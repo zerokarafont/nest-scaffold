@@ -8,7 +8,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiConsumes,
   ApiBody,
@@ -17,18 +17,14 @@ import {
   ApiCookieAuth,
 } from '@nestjs/swagger';
 import { SessionAuthGuard } from 'src/auth';
-import {
-  FileUploadDto,
-  FilesUploadDto,
-  FileQueryDto,
-} from '../../dto/file.dto';
+import { FileUploadDto, FileQueryDto } from '../../dto/file.dto';
 import { FileService } from '../../file.service';
 import { UploadType } from '../../interfaces/file-type';
 
 @ApiTags('file')
 @ApiCookieAuth()
 @UseGuards(SessionAuthGuard)
-@Controller('file/local')
+@Controller('file/ipfs')
 export class FileIPFSController {
   constructor(private readonly fileService: FileService) {}
 
@@ -41,18 +37,6 @@ export class FileIPFSController {
     return this.fileService.create(file, UploadType.IPFS);
   }
 
-  @Post('uploadFiles')
-  @UseInterceptors(FilesInterceptor('files'))
-  @ApiOperation({
-    summary: '上传多个文件到服务器',
-    description: '默认请求体最大50M',
-  })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: FilesUploadDto })
-  async uploadFiles(@UploadedFile() files: Array<Express.Multer.File>) {
-    console.log(files);
-  }
-
   @Post('updateFile/:id')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: '更新单个文件到服务器' })
@@ -61,24 +45,7 @@ export class FileIPFSController {
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(`${id}${file}`);
-  }
-
-  @Post('updateFiles')
-  @UseInterceptors(FilesInterceptor('files'))
-  @ApiOperation({
-    summary: '更新多个文件到服务器',
-    description: '默认请求体最大50M',
-  })
-  @ApiConsumes('multipart/form-data')
-  async updateFiles(@UploadedFile() files: Array<Express.Multer.File>) {
-    console.log(files);
-  }
-
-  @Get('remove/:id')
-  @ApiOperation({ summary: '删除单个文件' })
-  async removeOneFile(@Param('id') id: number) {
-    return await this.fileService.remove(id);
+    return this.fileService.update(id, file);
   }
 
   @Get('list')

@@ -28,3 +28,11 @@ export enum UploadType {
    */
   TENCENT_CLOUD = 'tencent_cloud',
 }
+
+/**
+ * 区分APP端和ADMIN端
+ */
+export enum Platform {
+  APP = 'APP',
+  ADMIN = 'ADMIN',
+}

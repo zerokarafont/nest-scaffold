@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { UploadType } from '../interfaces/file-type';
+import { Platform, UploadType } from '../interfaces/file-type';
 
 export class FileUploadDto {
   @IsNotEmpty()
@@ -41,6 +41,11 @@ export class FileQueryDto {
   @IsEnum(UploadType)
   @ApiPropertyOptional({ enum: UploadType })
   type?: UploadType;
+
+  @IsNotEmpty({ message: 'platform参数不能为空' })
+  @IsEnum(Platform)
+  @ApiProperty({ enum: Platform, required: true })
+  platform: Platform;
 
   @IsOptional()
   @IsNumber()
