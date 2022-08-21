@@ -81,3 +81,7 @@ export const PINATA_API_KEY = 'PINATA_API_KEY';
 export const PINATA_SECRET_API_KEY = 'PINATA_SECRET_API_KEY';
 
 export const PINATA_JWT = 'PINATA_JWT';
+/**
+ * Moralis服务
+ */
+export const MORALIS_API_KEY = 'MORALIS_API_KEY';

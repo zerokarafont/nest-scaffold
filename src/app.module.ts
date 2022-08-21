@@ -7,6 +7,7 @@ import {
   DB_PASS,
   DB_PORT,
   DB_USER,
+  MORALIS_API_KEY,
   REDIS_HOST,
   REDIS_PORT,
   SESSION_EXPIRES_IN_SECONDS,
@@ -22,6 +23,7 @@ import { IRedisOptions, PK_REDIS_OPTIONS, RedisModule } from './redis';
 import { AdminUserModule } from './user';
 import { FileModule } from './file';
 import { AuthModule } from './auth';
+import { MoralisModule } from './morails';
 import expressSession from 'express-session';
 import connectRedis from 'connect-redis';
 import Redis from 'ioredis';
@@ -67,6 +69,12 @@ const RedisStore = connectRedis(expressSession);
         ttl: +config.get(THROTTLE_TTL), // 每个请求将在存储中持续的秒数
         limit: +config.get(THROTTLE_LIMIT), // TTL 限制内的最大请求数
         storage: new ThrottlerStorageRedisService(),
+      }),
+    }),
+    MoralisModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        apiKey: config.get(MORALIS_API_KEY),
       }),
     }),
     UtilsModule,

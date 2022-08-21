@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { FileLocalModule, FileIPFSModule, FileArweaveModule } from './strategy';
+import { FileLocalModule, FileIPFSModule } from './strategy';
 
 @Module({
-  imports: [FileLocalModule, FileIPFSModule, FileArweaveModule],
+  imports: [FileLocalModule, FileIPFSModule],
   controllers: [],
   providers: [],
 })
